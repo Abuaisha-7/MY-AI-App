@@ -1,9 +1,7 @@
-// import { useState } from 'react'
-// import reactLogo from './assets/react.svg'
-// import viteLogo from '/vite.svg'
-// import './App.css'
+
 
 import { useEffect, useState } from "react"
+import { Button } from "./components/ui/button"
 
 function App() {
   const [message, setMessage] = useState('')
@@ -17,6 +15,7 @@ function App() {
   return (
     <div className="font-bold p-4 text-3xl">
       <h1>{message}</h1>
+      <Button variant="outline"> Click Me</Button>
     </div>
   )
 }
