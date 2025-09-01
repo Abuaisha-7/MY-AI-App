@@ -3,13 +3,15 @@ const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 export const chatService = {
    // Add service methods here
-   async sendMassage(prompt: string, conversationId: string) {
+   async sendMassage(
+      message: string,
+      history: Array<{ role: string; content: string }>
+   ) {
       // Implementation details
-      // Get or initialize history for this conversation
-      const history = conversationRepository.getMessageHistory(conversationId);
-
-      // Add current user prompt to history
-      history.push({ role: 'user', content: prompt });
+      const SYSTEM_PROMPT = `You are a concise, friendly assistant. 
+      - Keep answers short and clear.
+      - If unsure, ask a brief clarifying question.
+      - For code, prefer minimal runnable snippets.`;
 
       // Call OpenRouter API with full conversation history
 
@@ -25,7 +27,11 @@ export const chatService = {
             },
             body: JSON.stringify({
                model: 'gpt-3.5-turbo',
-               messages: history,
+               messages: [
+                  { role: 'system', content: SYSTEM_PROMPT },
+                  ...history,
+                  { role: 'user', content: message },
+               ],
                temperature: 0.7,
                max_new_tokens: 100,
             }),
@@ -33,16 +39,20 @@ export const chatService = {
       );
 
       const data = await response.json();
-      console.log('Full OpenRouter response:', JSON.stringify(data, null, 2));
-      // Get the assistant’s response
-      const answer = data.choices?.[0]?.message?.content || 'No answer found';
+      // Type guard to ensure 'data' is an object
+      if (typeof data !== 'object' || data === null) {
+         throw new Error('Invalid response from OpenRouter API');
+      }
+      // console.log('Full OpenRouter response:', JSON.stringify(data, null, 2));
+      // Get the assistant’s response safely
+      const answer =
+         Array.isArray((data as any).choices) &&
+         (data as any).choices[0]?.message?.content
+            ? (data as any).choices[0].message.content
+            : 'No answer found';
 
-      // Add assistant response to history
-      history.push({ role: 'assistant', content: answer });
+      console.log('@ service : ', answer);
 
-      // Save updated history
-      conversationRepository.addMessageToHistory(conversationId, history);
-
-      return answer;
+      return { reply: answer };
    },
 };
