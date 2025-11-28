@@ -21,7 +21,7 @@ export const chatService = {
             method: 'POST',
             headers: {
                Authorization: `Bearer ${OPENAI_API_KEY}`, // Ensure you have your API key in the .env file
-               'HTTP-Referer': 'http://localhost:3000', // Optional. Site URL for rankings on openrouter.ai.
+               'HTTP-Referer': 'https://my-ai-app-dby3.onrender.com', // Optional. Site URL for rankings on openrouter.ai.
                'X-Title': 'My Chat App', // Optional. Site title for rankings on openrouter.ai.
                'Content-Type': 'application/json',
             },
